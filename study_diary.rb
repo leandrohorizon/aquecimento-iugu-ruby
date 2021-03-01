@@ -1,14 +1,16 @@
+require_relative 'study_item'
+
 def clear
   system('clear')
 end
 
 def wait_keypress
   puts
-  puts 'Pressione enter para continuar'
-  gets
+  puts 'Pressione qualquer tecla para continuar'
+  gets #getch
 end
 
-def clear_and_wait_keypress
+def wait_keypress_and_clear
   wait_keypress
   clear
 end
@@ -17,9 +19,11 @@ def welcome
   'Bem-vindo ao Diário de Estudos, seu companheiro para estudar!'
 end
 
+INSERT = 1
+
 def menu
   clear
-  puts "[1] Cadastrar um item para estudar"
+  puts "[#{INSERT}] Cadastrar um item para estudar"
   puts "[2] Ver todos os itens cadastrados"
   puts "[3] Buscar um item de estudo"
   puts "[4] Sair"
@@ -34,22 +38,25 @@ def register_study_item
   category = gets.chomp
   puts "Item '#{title}' da categoria '#{category}' cadastrado com sucesso!"
   { title: title, category: category } #hash
+  StudyItem.new(title, category);
 end
 
 def print_items(collection)
   collection.each_with_index do |item, index|
-    puts "##{index + 1} - #{item[:title]} - #{item[:category]}"
+    puts "##{index + 1} - #{item.title} - #{item.category}"
   end
-  puts 'Nenhum item cadastrado' if collection.empty?
+  puts 'Nenhum item encontrado' if collection.empty?
 end
 
 def search_items(collection)
   print 'Digite uma palavra para procurar: '
   term = gets.chomp
   found_items = collection.filter do |item| #também pode usar colect e ..
-    item[:title].include? term
+    item.title.include? term
   end
-  puts found_items
+  puts found_items.map do |item|
+    item.title
+  end
   puts 'Nenhum item encontrado' if found_items.empty?
 end
 
@@ -73,7 +80,7 @@ while true
   else
     puts 'Opção inválida'
   end
-  clear_and_wait_keypress
+  wait_keypress_and_clear
   option = menu
 end
 
