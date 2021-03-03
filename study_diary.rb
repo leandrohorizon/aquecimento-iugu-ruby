@@ -19,14 +19,19 @@ def welcome
   'Bem-vindo ao Diário de Estudos, seu companheiro para estudar!'
 end
 
-INSERT = 1
+REGISTER  = 1
+VIEW      = 2
+SEARCH    = 3
+EXIT      = 4
+DELETE    = 5
 
 def menu
   clear
-  puts "[#{INSERT}] Cadastrar um item para estudar"
-  puts "[2] Ver todos os itens cadastrados"
-  puts "[3] Buscar um item de estudo"
-  puts "[4] Sair"
+  puts "[#{REGISTER}] Cadastrar um item para estudar"
+  puts "[#{VIEW}] Ver todos os itens cadastrados"
+  puts "[#{SEARCH}] Buscar um item de estudo"
+  puts "[#{DELETE}] Apagar um item de estudo"
+  puts "[#{EXIT}] Sair"
   print 'Escolha uma opção: '#não quebra a linha diferente do puts
   gets.to_i #get imput
 end
@@ -37,26 +42,21 @@ def register_study_item
   print 'Digite a categoria do seu item de estudo: '
   category = gets.chomp
   puts "Item '#{title}' da categoria '#{category}' cadastrado com sucesso!"
-  { title: title, category: category } #hash
   StudyItem.new(title, category);
 end
 
-def print_items(collection)
-  collection.each_with_index do |item, index|
-    puts "##{index + 1} - #{item.title} - #{item.category}"
-  end
-  puts 'Nenhum item encontrado' if collection.empty?
+def print_items
+  puts StudyItem.all
+  puts 'Nenhum item encontrado' if StudyItem.all.empty?
 end
 
-def search_items(collection)
+def search_items
   print 'Digite uma palavra para procurar: '
   term = gets.chomp
-  found_items = collection.filter do |item| #também pode usar colect e ..
-    item.title.include? term
+  found_items = StudyItem.all.filter do |item| #também pode usar colect e..
+    item.include? term
   end
-  puts found_items.map do |item|
-    item.title
-  end
+  puts found_items
   puts 'Nenhum item encontrado' if found_items.empty?
 end
 
@@ -68,15 +68,16 @@ option = menu
 while true
   clear
   case option
-  when 1
-    study_items << register_study_item
-  when 2
-    print_items(study_items)
-  when 3
-    search_items(study_items)
-  when 4
+  when REGISTER
+    StudyItem.register
+  when VIEW
+    puts StudyItem.all
+  when SEARCH
+    search_items
+  when EXIT
     puts 'Encerrando programa...'
-    break #break pode retornar valores break 10  
+    break #break pode retornar valores break 10
+  when DELETE
   else
     puts 'Opção inválida'
   end
